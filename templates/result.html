@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="result-container">
+    <div class="breadcrumb-nav">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            {% if product %}
+            <li class="breadcrumb-item"><a href="/{{ 'men' if product.gender == 'men' else 'women' }}">{{ product.gender|title }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('product_detail', product_id=product.id) }}">{{ product.name }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active">Virtual Try-On</li>
+        </ol>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="try-on-result-card">
+                <h2 class="result-title">Your Virtual Try-On</h2>
+                
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="result-image-container">
+                            <img id="resultImage" src="data:image/jpeg;base64,{{ img_data }}" alt="Try-on Result" class="result-image">
+                            <div class="adjust-controls">
+                                <h4>Fine-tune Fit</h4>
+                                <div class="slider-group">
+                                    <label for="xPositionSlider">X Position:</label>
+                                    <input type="range" id="xPositionSlider" min="-50" max="50" value="0" step="1" class="slider" oninput="updateSliderValue('xPosition')">
+                                    <span id="xPositionValue">0</span>
+                                </div>
+                                <div class="slider-group">
+                                    <label for="yPositionSlider">Y Position:</label>
+                                    <input type="range" id="yPositionSlider" min="-50" max="50" value="0" step="1" class="slider" oninput="updateSliderValue('yPosition')">
+                                    <span id="yPositionValue">0</span>
+                                </div>
+                                <div class="slider-group">
+                                    <label for="sizeSlider">Size:</label>
+                                    <input type="range" id="sizeSlider" min="0.6" max="1.4" value="1.0" step="0.01" class="slider" oninput="updateSliderValue('size')">
+                                    <span id="sizeValue">1.0</span>
+                                </div>
+                                <button id="applyChangesBtn" class="action-btn apply-btn" onclick="applyChanges()">
+                                    <i class="fas fa-check"></i>
+                                    <span>Apply Changes</span>
+                                </button>
+                                <div id="adjustmentStatus" class="mt-2"></div>
+                            </div>
+                            <div class="result-actions">
+                                <button class="action-btn save-btn" onclick="saveImage()">
+                                    <i class="fas fa-download"></i>
+                                    <span>Save</span>
+                                </button>
+                                <button class="action-btn share-btn" data-bs-toggle="modal" data-bs-target="#shareModal">
+                                    <i class="fas fa-share-alt"></i>
+                                    <span>Share</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5">
+                        {% if product %}
+                        <div class="selected-product">
+                            <div class="product-header">
+                                <h3 class="selected-label">Selected Item</h3>
+                                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="view-details">View Details</a>
+                            </div>
+                            
+                            <div class="product-snapshot">
+                                <div class="product-image-small">
+                                    <img src="{{ url_for('static', filename='images/collection/' + product.image) }}" alt="{{ product.name }}">
+                                </div>
+                                <div class="product-info-small">
+                                    <div class="product-brand">{{ product.brand }}</div>
+                                    <div class="product-name">{{ product.name }}</div>
+                                    <div class="product-price">
+                                        <span class="current-price">₹{{ product.price }}</span>
+                                        {% if product.original_price %}
+                                        <span class="price-strike">₹{{ product.original_price }}</span>
+                                        {% endif %}
+                                        {% if product.discount %}
+                                        <span class="discount">({{ product.discount }}% OFF)</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="purchase-options">
+                                <div class="size-selector-compact">
+                                    <label>Size:</label>
+                                    <div class="size-options">
+                                        {% for size in ['S', 'M', 'L', 'XL', 'XXL'] %}
+                                        <label class="size-option">
+                                            <input type="radio" name="size" value="{{ size }}">
+                                            <span class="size-label">{{ size }}</span>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="quantity-selector">
+                                    <label>Quantity:</label>
+                                    <div class="quantity-control">
+                                        <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
+                                        <input type="number" value="1" min="1" max="10" id="quantity">
+                                        <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+                                    </div>
+                                </div>
+                                
+                                <button class="add-to-bag-btn">
+                                    <i class="fas fa-shopping-bag me-2"></i>Add to Bag
+                                </button>
+                                <button class="wishlist-btn-large">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="try-on-controls">
+                            <a href="{{ url_for('upload_file') }}{% if product %}?product_id={{ product.id }}{% endif %}" class="try-again-btn">
+                                <i class="fas fa-redo me-2"></i>Try Again
+                            </a>
+                            <a href="{{ url_for('upload_file') }}" class="try-different-btn">
+                                <i class="fas fa-tshirt me-2"></i>Try Different Item
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendations-section">
+                <h3 class="section-title">You May Also Like</h3>
+                <div class="product-scroll">
+                    <div class="product-scroll-container">
+                        {% for i in range(4) %}
+                        <div class="product-card">
+                            <div class="product-image-container">
+                                <img src="{{ url_for('static', filename='images/collection/' + product.image) if product else url_for('static', filename='images/collection/06802_00.jpg') }}" class="product-image" alt="Similar product">
+                                <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                            </div>
+                            <div class="product-info">
+                                <div class="product-brand">BharatFit</div>
+                                <div class="product-name">Similar Style</div>
+                                <div class="product-price">
+                                    <span class="current-price">₹1299</span>
+                                </div>
+                                <a href="{{ url_for('upload_file') }}" class="try-on-btn">Virtual Try-On</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareModalLabel">Share Your Look</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="social-share-grid">
+                    <button class="social-share-btn facebook">
+                        <i class="fab fa-facebook-f"></i>
+                        <span>Facebook</span>
+                    </button>
+                    <button class="social-share-btn twitter">
+                        <i class="fab fa-twitter"></i>
+                        <span>Twitter</span>
+                    </button>
+                    <button class="social-share-btn instagram">
+                        <i class="fab fa-instagram"></i>
+                        <span>Instagram</span>
+                    </button>
+                    <button class="social-share-btn pinterest">
+                        <i class="fab fa-pinterest"></i>
+                        <span>Pinterest</span>
+                    </button>
+                    <button class="social-share-btn whatsapp">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>WhatsApp</span>
+                    </button>
+                    <button class="social-share-btn email">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email</span>
+                    </button>
+                </div>
+                <div class="share-link-container mt-3">
+                    <input type="text" class="form-control" id="shareLink" value="https://bharatfit.com/share/12345" readonly>
+                    <button class="copy-link-btn" onclick="copyShareLink()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Store original image paths provided by Flask
+const modelImagePath = "{{ model_img }}";
+const clothesImagePath = "{{ clothes_img }}";
+const outputImagePath = "{{ output_img }}";
+const garmentType = "{{ garment_type }}";
+
+// Store slider values
+let xOffset = 0;
+let yOffset = 0;
+let sizeFactor = 1.0;
+
+// Track adjustment timer for debouncing
+let adjustmentTimer = null;
+let adjustmentsInProgress = false;
+let lastAppliedValues = { x: 0, y: 0, size: 1.0 };
+
+function updateSliderValue(type) {
+    // Update the current values
+    if (type === 'xPosition') {
+        xOffset = parseInt(document.getElementById('xPositionSlider').value);
+        document.getElementById('xPositionValue').textContent = xOffset;
+    } else if (type === 'yPosition') {
+        yOffset = parseInt(document.getElementById('yPositionSlider').value);
+        document.getElementById('yPositionValue').textContent = yOffset;
+    } else if (type === 'size') {
+        sizeFactor = parseFloat(document.getElementById('sizeSlider').value);
+        document.getElementById('sizeValue').textContent = sizeFactor.toFixed(2);
+    }
+    
+    // Apply real-time preview using CSS transform
+    const resultImage = document.getElementById('resultImage');
+    resultImage.style.transition = 'transform 0.1s ease-out';
+    resultImage.style.transform = `translate(${xOffset/5}px, ${yOffset/5}px) scale(${sizeFactor})`;
+    
+    // Schedule auto-adjustment if there's a significant change
+    scheduleAutoAdjustment();
+}
+
+// Function to determine if adjustment is needed based on significant changes
+function hasSignificantChanges() {
+    return Math.abs(xOffset - lastAppliedValues.x) >= 5 || 
+           Math.abs(yOffset - lastAppliedValues.y) >= 5 || 
+           Math.abs(sizeFactor - lastAppliedValues.size) >= 0.05;
+}
+
+// Schedule auto-adjustment with debouncing
+function scheduleAutoAdjustment() {
+    // Cancel any pending adjustments
+    if (adjustmentTimer) {
+        clearTimeout(adjustmentTimer);
+    }
+    
+    // Only apply if not already in progress and has significant changes
+    if (!adjustmentsInProgress && hasSignificantChanges()) {
+        adjustmentTimer = setTimeout(() => {
+            applyChanges(true);
+        }, 500); // 500ms debounce for better user experience
+    }
+}
+
+function applyChanges(isAutoAdjust = false) {
+    // Avoid multiple simultaneous requests
+    if (adjustmentsInProgress) return;
+    
+    // For auto-adjustments, only proceed if significant changes exist
+    if (isAutoAdjust && !hasSignificantChanges()) return;
+    
+    adjustmentsInProgress = true;
+    
+    // Remove any CSS transforms before applying real changes
+    const resultImage = document.getElementById('resultImage');
+    resultImage.style.transition = '';
+    resultImage.style.transform = '';
+    
+    // Show loading state
+    const statusElement = document.getElementById('adjustmentStatus');
+    const applyBtn = document.getElementById('applyChangesBtn');
+    
+    if (!isAutoAdjust) {
+        // Only show spinner for manual adjustments
+        statusElement.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div> Adjusting fit...';
+    } else {
+        statusElement.innerHTML = '<div class="text-primary"><i class="fas fa-sync fa-spin"></i> Fine-tuning...</div>';
+    }
+    applyBtn.disabled = true;
+    
+    // Store the values we're applying now
+    lastAppliedValues = {
+        x: xOffset,
+        y: yOffset,
+        size: sizeFactor
+    };
+    
+    // Prepare data for AJAX request
+    const data = {
+        model_img: modelImagePath,
+        clothes_img: clothesImagePath,
+        output_img: outputImagePath,
+        x_offset: xOffset,
+        y_offset: yOffset,
+        size_factor: sizeFactor,
+        garment_type: garmentType
+    };
+    
+    // Send AJAX request to adjust the overlay
+    fetch('/adjust_overlay', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Update the image with the new adjusted version
+            document.getElementById('resultImage').src = 'data:image/jpeg;base64,' + data.img_data;
+            
+            if (!isAutoAdjust) {
+                // Only show success for manual adjustments
+                statusElement.innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Fit adjusted successfully!</span>';
+            } else {
+                statusElement.innerHTML = '';
+            }
+        } else {
+            statusElement.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-circle"></i> ' + (data.error || 'Failed to adjust fit') + '</span>';
+        }
+    })
+    .catch(error => {
+        console.error('Error adjusting overlay:', error);
+        statusElement.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-circle"></i> Error adjusting fit</span>';
+    })
+    .finally(() => {
+        adjustmentsInProgress = false;
+        applyBtn.disabled = false;
+        
+        // Clear status after a while for auto-adjustments
+        if (isAutoAdjust) {
+            setTimeout(() => {
+                if (document.getElementById('adjustmentStatus').innerHTML.includes('Fine-tuning')) {
+                    document.getElementById('adjustmentStatus').innerHTML = '';
+                }
+            }, 1000);
+        }
+    });
+}
+
+function saveImage() {
+    // Logic for saving image would go here
+    // For a simple demo, we can just trigger print which allows saving
+    window.print();
+}
+
+function copyShareLink() {
+    var copyText = document.getElementById("shareLink");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    
+    var copyBtn = document.querySelector(".copy-link-btn");
+    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    setTimeout(function() {
+        copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+    }, 2000);
+}
+
+function increaseQuantity() {
+    var input = document.getElementById("quantity");
+    var value = parseInt(input.value, 10);
+    value = isNaN(value) ? 0 : value;
+    if(value < 10) {
+        input.value = value + 1;
+    }
+}
+
+function decreaseQuantity() {
+    var input = document.getElementById("quantity");
+    var value = parseInt(input.value, 10);
+    if(value > 1) {
+        input.value = value - 1;
+    }
+}
+</script>
+{% endblock %}

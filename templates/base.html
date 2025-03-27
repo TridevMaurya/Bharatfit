@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BharatFit - Virtual Try-On Fashion Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+<style>
+/* These are inline overrides - the main variables are in styles.css */
+</style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand logo" href="{{ url_for('index') }}">
+                <span style="font-weight: bold; background: linear-gradient(45deg, var(--primary-color), var(--accent-color-1), var(--accent-color-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BHARATFIT</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('men') }}">MEN</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('women') }}">WOMEN</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('upload_file') }}">UPLOAD & TRY</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('download') }}" style="color: var(--accent-color-1); font-weight: bold;">
+                            <i class="fas fa-download"></i> DOWNLOAD APP
+                        </a>
+                    </li>
+
+                </ul>
+                <form class="d-flex me-3" action="{{ url_for('search') }}" method="GET">
+                    <input class="form-control" type="search" name="q" placeholder="Search products...">
+                    <button class="btn" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-5 pt-3">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="footer mt-5 py-4 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>ONLINE SHOPPING</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('men') }}" class="text-muted">Men</a></li>
+                        <li><a href="{{ url_for('women') }}" class="text-muted">Women</a></li>
+                        <li><a href="{{ url_for('upload_file') }}" class="text-muted">Try-On Studio</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>CUSTOMER POLICIES</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted">Contact Us</a></li>
+                        <li><a href="#" class="text-muted">FAQ</a></li>
+                        <li><a href="#" class="text-muted">Terms Of Use</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>BHARATFIT APP</h5>
+                    <div class="app-downloads">
+                        <a href="{{ url_for('download') }}" class="btn btn-primary mb-2" style="background-color: var(--accent-color-2); border-color: var(--accent-color-2);">
+                            <i class="fas fa-download"></i> Download Website
+                        </a>
+                        <a href="#" class="btn btn-dark mb-2">
+                            <i class="fab fa-google-play"></i> Android App
+                        </a>
+                        <a href="#" class="btn btn-dark">
+                            <i class="fab fa-apple"></i> iOS App
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <h5>KEEP IN TOUCH</h5>
+                    <div class="social-links">
+                        <a href="#" class="text-muted me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-muted me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-muted me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-muted"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+

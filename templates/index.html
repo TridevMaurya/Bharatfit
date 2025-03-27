@@ -1,0 +1,100 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section mb-5" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="hero-banner">
+                <h1 style="color: var(--white-text);">Virtual Try-On Experience</h1>
+                <p style="color: var(--white-text);">Try clothes virtually before you buy!</p>
+                <a href="{{ url_for('upload_file') }}" class="hero-cta-btn">Try Now</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="products-section mb-5">
+    <h2 class="section-title text-center mb-4">Available Products</h2>
+    <div class="products-container">
+        <div class="product-grid">
+            <div class="product-card">
+                <div class="product-image-container">
+                    <img src="{{ url_for('static', filename='images/collection/07429_00.jpg') }}" alt="Black Lace Sleeve Top" class="product-image">
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                </div>
+                <div class="product-info">
+                    <div class="product-brand">BharatFit</div>
+                    <div class="product-name">Black Lace Sleeve Top</div>
+                    <div class="product-price">
+                        <span class="current-price">₹1499</span>
+                        <span class="price-strike">₹2499</span>
+                        <span class="discount">(40% OFF)</span>
+                    </div>
+                    <a href="{{ url_for('upload_file') }}" class="try-on-btn">Virtual Try-On</a>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="product-image-container">
+                    <img src="{{ url_for('static', filename='images/collection/06802_00.jpg') }}" alt="Navy Polka Dot Top" class="product-image">
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                </div>
+                <div class="product-info">
+                    <div class="product-brand">BharatFit</div>
+                    <div class="product-name">Navy Polka Dot Top</div>
+                    <div class="product-price">
+                        <span class="current-price">₹1299</span>
+                        <span class="price-strike">₹1999</span>
+                        <span class="discount">(35% OFF)</span>
+                    </div>
+                    <a href="{{ url_for('upload_file') }}" class="try-on-btn">Virtual Try-On</a>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="product-image-container">
+                    <img src="{{ url_for('static', filename='images/collection/08348_00.jpg') }}" alt="Floral Print Cami" class="product-image">
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                </div>
+                <div class="product-info">
+                    <div class="product-brand">BharatFit</div>
+                    <div class="product-name">Floral Print Cami</div>
+                    <div class="product-price">
+                        <span class="current-price">₹1199</span>
+                        <span class="price-strike">₹1499</span>
+                        <span class="discount">(33% OFF)</span>
+                    </div>
+                    <a href="{{ url_for('upload_file') }}" class="try-on-btn">Virtual Try-On</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-section mb-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card" style="border-top: 3px solid var(--primary-color);">
+                <i class="fas fa-truck" style="color: var(--primary-color);"></i>
+                <h3>Free Shipping</h3>
+                <p>On orders above ₹999</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card" style="border-top: 3px solid var(--secondary-color);">
+                <i class="fas fa-undo" style="color: var(--secondary-color);"></i>
+                <h3>Easy Returns</h3>
+                <p>30-day return policy</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card" style="border-top: 3px solid var(--accent-color-1);">
+                <i class="fas fa-shield-alt" style="color: var(--accent-color-1);"></i>
+                <h3>Secure Shopping</h3>
+                <p>100% secure checkout</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

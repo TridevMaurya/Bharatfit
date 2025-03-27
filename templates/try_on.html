@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="product-preview mb-4">
+                <img src="{{ url_for('static', filename='images/collection/' + product.image) }}" 
+                     alt="{{ product.name }}" 
+                     class="img-fluid">
+                <div class="product-info mt-3">
+                    <h4 class="product-brand">{{ product.brand }}</h4>
+                    <h5 class="product-name">{{ product.name }}</h5>
+                    <div class="product-price d-flex align-items-center">
+                        <span class="me-2">₹{{ product.price }}</span>
+                        <span class="price-strike">₹{{ product.original_price }}</span>
+                        <span class="discount">({{ product.discount }}% OFF)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="upload-section">
+                <h4>Try On This Product</h4>
+                <p class="text-muted">Upload your photo to see how this item looks on you</p>
+                <form method="POST" enctype="multipart/form-data" class="mt-4">
+                    <div class="mb-3">
+                        <label for="model_image" class="form-label">Your Photo</label>
+                        <input type="file" class="form-control" id="model_image" name="model_image" accept="image/*" required>
+                        <div class="form-text">
+                            For best results:
+                            <ul class="mt-2">
+                                <li>Use a clear, well-lit photo</li>
+                                <li>Stand against a plain background</li>
+                                <li>Face the camera directly</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn try-on-btn">Generate Try-On</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<div class="try-on-container">
+    <div class="try-on-preview">
+        <img id="try-on-image" src="{{ user_image_url }}" alt="Try On Preview">
+    </div>
+    <div class="try-on-controls">
+        <button class="try-on-btn">Try On</button>
+        <button class="reset-btn">Reset</button>
+    </div>
+</div>
+/* Try-On Container */
+.try-on-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: #f9f9f9;
+}
+
+/* Try-On Preview */
+.try-on-preview img {
+    max-width: 350px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+}
+
+/* Controls */
+.try-on-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.reset-btn {
+    background: #333;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.reset-btn:hover {
+    background: #555;
+}

@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="product-detail-container">
+    <div class="breadcrumb-nav">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/{{ 'men' if product.gender == 'men' else 'women' }}">{{ product.gender|title }}</a></li>
+            <li class="breadcrumb-item active">{{ product.type|replace('_', ' ')|title }}</li>
+        </ol>
+    </div>
+
+    <div class="row product-detail">
+        <div class="col-lg-5 col-md-6">
+            <div class="product-gallery">
+                <div class="main-image-container">
+                    <img src="{{ url_for('static', filename='images/collection/' + product.image) }}" alt="{{ product.name }}" class="main-image" id="mainImage">
+                </div>
+                <div class="thumbnail-container">
+                    <div class="thumbnail-slider">
+                        <div class="thumbnail active" onclick="changeMainImage(this)">
+                            <img src="{{ url_for('static', filename='images/collection/' + product.image) }}" alt="{{ product.name }}">
+                        </div>
+                        {% if product.type == 'upper_body' %}
+                            <div class="thumbnail" onclick="changeMainImage(this)">
+                                <img src="{{ url_for('static', filename='images/collection/' + product.image) }}" alt="Back view">
+                            </div>
+                            <div class="thumbnail" onclick="changeMainImage(this)">
+                                <img src="{{ url_for('static', filename='images/collection/' + product.image) }}" alt="Detail view">
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7 col-md-6">
+            <div class="product-info-container">
+                <div class="product-header">
+                    <h1 class="product-brand">{{ product.brand }}</h1>
+                    <h2 class="product-name">{{ product.name }}</h2>
+                    <div class="product-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <span class="rating-count">(120 Reviews)</span>
+                    </div>
+                </div>
+
+                <div class="product-pricing">
+                    <div class="price-container">
+                        <span class="current-price">₹{{ product.price }}</span>
+                        {% if product.original_price %}
+                        <span class="original-price">₹{{ product.original_price }}</span>
+                        {% endif %}
+                        {% if product.discount %}
+                        <span class="discount">({{ product.discount }}% OFF)</span>
+                        {% endif %}
+                    </div>
+                    <div class="tax-info">Inclusive of all taxes</div>
+                </div>
+
+                <div class="size-selector">
+                    <div class="size-header">
+                        <h3>Select Size</h3>
+                        <a href="#" class="size-chart-link">Size Chart <i class="fas fa-ruler"></i></a>
+                    </div>
+                    <div class="size-options">
+                        {% for size in ['S', 'M', 'L', 'XL', 'XXL'] %}
+                        <label class="size-option">
+                            <input type="radio" name="size" value="{{ size }}">
+                            <span class="size-label">{{ size }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="product-actions">
+                    <a href="{{ url_for('upload_file', product_id=product.id) }}" class="try-on-btn-large">
+                        <i class="fas fa-tshirt me-2"></i>Try On Now
+                    </a>
+                    <button class="add-to-bag-btn">
+                        <i class="fas fa-shopping-bag me-2"></i>Add to Bag
+                    </button>
+                    <button class="wishlist-btn-large">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+
+                <div class="delivery-options">
+                    <h3>Delivery Options</h3>
+                    <div class="pincode-checker">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Enter pincode" maxlength="6" pattern="[0-9]{6}">
+                            <button class="btn btn-check">Check</button>
+                        </div>
+                    </div>
+                    <div class="delivery-info">
+                        <div class="delivery-item">
+                            <i class="fas fa-truck"></i>
+                            <span>Free delivery on orders above ₹999</span>
+                        </div>
+                        <div class="delivery-item">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span>Easy 30 days return & exchange</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-details-accordion">
+                    <div class="accordion accordion-flush" id="productAccordion">
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#productDetails">
+                                    Product Details
+                                </button>
+                            </h3>
+                            <div id="productDetails" class="accordion-collapse collapse show" data-bs-parent="#productAccordion">
+                                <div class="accordion-body">
+                                    <ul class="detail-list">
+                                        <li><span>Material:</span> 100% Cotton</li>
+                                        <li><span>Fit:</span> Regular Fit</li>
+                                        <li><span>Wash Care:</span> Machine wash</li>
+                                        <li><span>Type:</span> {{ product.type|replace('_', ' ')|title }}</li>
+                                        <li><span>Length:</span> Regular</li>
+                                        <li><span>Pattern:</span> Solid</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="similar-products mt-5">
+        <h3 class="section-title">You May Also Like</h3>
+        <div class="product-scroll">
+            <div class="product-scroll-container">
+                {% for i in range(4) %}
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="{{ url_for('static', filename='images/collection/' + product.image) }}" alt="Similar product" class="product-image">
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-brand">{{ product.brand }}</div>
+                        <div class="product-name">Similar {{ product.type|replace('_', ' ') }}</div>
+                        <div class="product-price">
+                            <span class="current-price">₹{{ product.price }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function changeMainImage(thumbnail) {
+    // Remove active class from all thumbnails
+    document.querySelectorAll('.thumbnail').forEach(thumb => {
+        thumb.classList.remove('active');
+    });
+    
+    // Add active class to clicked thumbnail
+    thumbnail.classList.add('active');
+    
+    // Update main image
+    document.getElementById('mainImage').src = thumbnail.querySelector('img').src;
+}
+</script>
+{% endblock %}
